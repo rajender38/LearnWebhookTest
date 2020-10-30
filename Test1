@@ -1,0 +1,26 @@
+           var param = "";
+            var post = @params;
+
+            var jobResponse = callArcGISServer(param, post);
+            return JsonConvert.DeserializeObject<ArcGISServerAsyncResponse>(jobResponse);
+        }
+
+        public completedJob getJobStatus(string jobID)
+        {
+            var urlParams = "jobs/" + jobID;
+
+            string[] badStatusCodes = { "esriJobFailed", "esriJobTimedOut" };
+            string[] cancelStatusCodes = { "esriJobCancelling", "esriJobCancelled" };
+
+            var successStr = "FALSE";
+            var success = false;
+            var outURL = "";
+            var outMessage = "FAILURE";
+
+            var isRunning = true;
+            while (isRunning)
+            {
+                var responseFromServerStatus = callArcGISServer(urlParams);
+                var jsonResultStatus =
+                    JsonConvert.DeserializeObject<ArcGISServerAsyncResponse>(responseFromServerStatus);
+                if (jsonResultStatus.jobStatus == null)
